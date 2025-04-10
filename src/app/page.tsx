@@ -14,10 +14,10 @@ export default function Home() {
         {/* ヘッダー部分 */}
         <header className="mb-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white tracking-widest mb-2">
-            化学シミュレーション集 <span className="inline-block">🔬</span>
+            化学app <span className="inline-block">🔬</span>
           </h1>
           <p className="text-gray-200 md:text-lg">
-            Reactions, Elements, and Endless Possibilities
+            Let's Enjoy Chemical !!
           </p>
         </header>
 
@@ -38,7 +38,7 @@ export default function Home() {
               "
               href="/element-simulator"
             >
-              Element Simulator
+              電子配置シミュレーション
             </Link>
           </li>
           {/* ほかのゲームへのリンクを増やす場合はここに追加 */}
