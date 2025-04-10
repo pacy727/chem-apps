@@ -1,52 +1,49 @@
 // src/app/page.tsx
-'use client' // ReactのuseState等のフロントエンド機能を有効にする
 
-import { useState } from 'react'
+import Link from 'next/link'
 
 export default function Home() {
-  const [isClicked, setIsClicked] = useState(false)
-
-  // クリック時に背景色を切り替えるハンドラ
-  const handleClick = () => {
-    setIsClicked(!isClicked)
-  }
-
   return (
-    <div className="flex flex-col items-center space-y-8">
-      {/* タイトル */}
-      <h2 className="text-4xl font-bold text-center mt-8">
-        化学シミュレーション集
-      </h2>
+    <main className="
+      min-h-screen 
+      bg-gradient-to-br from-indigo-800 via-purple-700 to-pink-500 
+      flex items-center justify-center
+    ">
+      {/* コンテンツを中央に配置 */}
+      <div className="p-8 w-full max-w-3xl bg-white/10 backdrop-blur-md rounded-lg shadow-2xl">
+        {/* ヘッダー部分 */}
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white tracking-widest mb-2">
+            化学シミュレーション集 <span className="inline-block">🔬</span>
+          </h1>
+          <p className="text-gray-200 md:text-lg">
+            Reactions, Elements, and Endless Possibilities
+          </p>
+        </header>
 
-      {/* ホバー時にwiggleアニメーションさせる要素 */}
-      <div
-        className="
-          w-48 h-48
-          bg-blue-500 
-          flex items-center justify-center
-          rounded-xl shadow-lg
-          text-white text-xl font-semibold
-          hover:animate-wiggle
-          transition
-        "
-      >
-        Hover Me!
+        {/* コンテンツリンク部分 */}
+        <ul className="space-y-5 text-center">
+          <li>
+            <Link
+              className="
+                inline-block 
+                px-6 py-3 
+                text-lg font-semibold 
+                text-white 
+                bg-blue-500 hover:bg-blue-600 
+                rounded-full 
+                shadow-md 
+                transition-all 
+                duration-300
+              "
+              href="/element-simulator"
+            >
+              Element Simulator
+            </Link>
+          </li>
+          {/* ほかのゲームへのリンクを増やす場合はここに追加 */}
+        </ul>
       </div>
-
-      {/* クリック時に色が変わる要素 */}
-      <button
-        onClick={handleClick}
-        className={`
-          w-48 h-48
-          ${isClicked ? 'bg-green-500' : 'bg-red-500'}
-          flex items-center justify-center
-          rounded-xl shadow-lg
-          text-white text-xl font-semibold
-          transition-colors duration-300
-        `}
-      >
-        {isClicked ? 'Clicked!' : 'Click Me!'}
-      </button>
-    </div>
+    </main>
   )
 }
