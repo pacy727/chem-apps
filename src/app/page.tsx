@@ -17,7 +17,7 @@ export default function Home() {
             化学app <span className="inline-block">🔬</span>
           </h1>
           <p className="text-gray-200 md:text-lg">
-            Let's Enjoy Chemical !!
+            Let&apos;s Enjoy Chemical !!
           </p>
         </header>
 
