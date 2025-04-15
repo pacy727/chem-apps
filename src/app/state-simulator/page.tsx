@@ -1,6 +1,6 @@
-// src/app/element-simulator/page.tsx
+// src/app/state-simulator/page.tsx
 'use client';
-export default function Game1Page() {
+export default function Game2Page() {
   return (
     <iframe
       src="/state-simulator/index.html"
