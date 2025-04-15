@@ -41,6 +41,24 @@ export default function Home() {
               電子配置シミュレーション
             </Link>
           </li>
+          <li>
+            <Link
+              className="
+                inline-block 
+                px-6 py-3 
+                text-lg font-semibold 
+                text-white 
+                bg-blue-500 hover:bg-blue-600 
+                rounded-full 
+                shadow-md 
+                transition-all 
+                duration-300
+              "
+              href="/state-simulator"
+            >
+              状態変化シミュレーション
+            </Link>
+          </li>
           {/* ほかのゲームへのリンクを増やす場合はここに追加 */}
         </ul>
       </div>

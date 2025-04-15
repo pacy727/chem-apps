@@ -3,9 +3,9 @@
 export default function Game1Page() {
   return (
     <iframe
-      src="/element-simulator/index.html"
+      src="/state-simulator/index.html"
       className="w-full h-screen border-0"
-      title="element-simulator"
+      title="state-simulator"
     ></iframe>
   );
 }
