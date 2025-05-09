@@ -74,7 +74,7 @@ export default function Home() {
               "
               href="/kemida"
             >
-              ケミ打
+              　　　　 ケミ打 　　　　
             </Link>
           </li>
           {/* ほかのゲームへのリンクを増やす場合はここに追加 */}
