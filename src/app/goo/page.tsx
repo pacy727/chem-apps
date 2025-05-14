@@ -370,12 +370,12 @@ const CircleSimulation: React.FC = () => {
           
           if (circle.personality === '臆病') {
             // マウスから逃げる
-            circle.vx -= (dx / distanceToMouse) * influence * 0.2;
-            circle.vy -= (dy / distanceToMouse) * influence * 0.2;
+            circle.vx -= (dx / distanceToMouse) * influence * 1;
+            circle.vy -= (dy / distanceToMouse) * influence * 1;
           } else if (circle.personality === '好奇心') {
             // マウスに近づく
-            circle.vx += (dx / distanceToMouse) * influence * 0.1;
-            circle.vy += (dy / distanceToMouse) * influence * 0.1;
+            circle.vx += (dx / distanceToMouse) * influence * 1;
+            circle.vy += (dy / distanceToMouse) * influence * 1;
           }
           // 無関心は何もしない
         }
@@ -395,12 +395,12 @@ const CircleSimulation: React.FC = () => {
               
               if (circle.personality === '社交的') {
                 // 他の丸に近づく
-                circle.vx += (dx / distance) * influence * 0.03;
-                circle.vy += (dy / distance) * influence * 0.03;
+                circle.vx += (dx / distance) * influence * 0.1;
+                circle.vy += (dy / distance) * influence * 0.1;
               } else if (circle.personality === '一匹狼') {
                 // 他の丸から離れる
-                circle.vx -= (dx / distance) * influence * 0.03;
-                circle.vy -= (dy / distance) * influence * 0.03;
+                circle.vx -= (dx / distance) * influence * 0.5;
+                circle.vy -= (dy / distance) * influence * 0.5;
               }
             }
           }
@@ -774,7 +774,7 @@ const CircleSimulation: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center p-4 bg-gray-100 rounded-lg">
-      <h2 className="text-xl font-bold mb-2 text-gray-800">癒しの丸シミュレーション</h2>
+      <h2 className="text-xl font-bold mb-2 text-gray-800">癒しのグー</h2>
       <div className="relative mb-2">
         <canvas ref={canvasRef} className="bg-white rounded-lg shadow-md cursor-pointer" />
       </div>

@@ -120,7 +120,7 @@ export default function Home() {
               "
               href="/goo"
             >
-              粒子
+              癒しのグー
             </Link>
           </li>
 
