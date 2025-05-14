@@ -26,7 +26,9 @@ export default function Home() {
           <li>
             <Link
               className="
-                inline-block 
+                inline-block
+                w-72   /* 幅 12rem (48×0.25rem) */
+                h-13   /* 高さ 3.5rem               */ 
                 px-6 py-3 
                 text-lg font-semibold 
                 text-white 
@@ -45,6 +47,8 @@ export default function Home() {
             <Link
               className="
                 inline-block 
+                w-72   /* 幅 12rem (48×0.25rem) */
+                h-13   /* 高さ 3.5rem               */                 
                 px-6 py-3 
                 text-lg font-semibold 
                 text-white 
@@ -63,6 +67,8 @@ export default function Home() {
             <Link
               className="
                 inline-block 
+                w-72   /* 幅 12rem (48×0.25rem) */
+                h-13   /* 高さ 3.5rem               */                 
                 px-6 py-3 
                 text-lg font-semibold 
                 text-white 
@@ -74,9 +80,50 @@ export default function Home() {
               "
               href="/kemida"
             >
-              　　　　 ケミ打 　　　　
+              ケミ打
             </Link>
           </li>
+          <li>
+            <Link
+              className="
+                inline-block 
+                w-72   /* 幅 12rem (48×0.25rem) */
+                h-13   /* 高さ 3.5rem               */                 
+                px-6 py-3 
+                text-lg font-semibold 
+                text-white 
+                bg-blue-500 hover:bg-blue-600 
+                rounded-full 
+                shadow-md 
+                transition-all 
+                duration-300
+              "
+              href="/gencho"
+            >
+              原子調合シミュレーション
+            </Link>
+          </li>
+          <li>
+            <Link
+              className="
+                inline-block 
+                w-72   
+                h-13  
+                px-6 py-3 
+                text-lg font-semibold 
+                text-white 
+                bg-blue-500 hover:bg-blue-600 
+                rounded-full 
+                shadow-md 
+                transition-all 
+                duration-300
+              "
+              href="/goo"
+            >
+              粒子
+            </Link>
+          </li>
+
           {/* ほかのゲームへのリンクを増やす場合はここに追加 */}
         </ul>
       </div>
