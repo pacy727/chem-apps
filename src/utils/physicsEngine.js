@@ -27,7 +27,7 @@ export const angle = (x1, y1, x2, y2) => {
 };
 
 // 原子の動きを更新
-export const updateAtomPosition = (atom, canvasWidth, canvasHeight, atoms, bonds) => {
+export const updateAtomPosition = (atom, canvasWidth, canvasHeight, atoms) => {
   const newAtom = { ...atom };
   
   // 状態に応じた物理挙動
@@ -114,7 +114,7 @@ export const updateAtomPosition = (atom, canvasWidth, canvasHeight, atoms, bonds
 };
 
 // 原子間の相互作用を計算
-export const calculateAtomInteractions = (atoms, canvasWidth, canvasHeight) => {
+export const calculateAtomInteractions = (atoms) => {
   const newAtoms = [...atoms];
   
   // 分子グループを特定
