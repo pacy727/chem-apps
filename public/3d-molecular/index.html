@@ -905,10 +905,26 @@
                         bondMesh.scale.y = distance;
                         bondMesh.position.copy(start.clone().add(end).multiplyScalar(0.5));
 
+                        // if (bondCount > 1) {
+                        //     const offset = (i - (bondCount - 1) / 2) * 0.15;
+                        //     const perpendicular = new THREE.Vector3(0, 1, 0);
+                        //     const direction = end.clone().sub(start).normalize();
+                        //     const cross = perpendicular.cross(direction).normalize();
+                        //     bondMesh.position.add(cross.multiplyScalar(offset));
+                        // }
+
                         if (bondCount > 1) {
-                            const offset = (i - (bondCount - 1) / 2) * 0.15;
-                            const perpendicular = new THREE.Vector3(0, 1, 0);
+                            const offset = (i - (bondCount - 1) / 2) * 0.2;
                             const direction = end.clone().sub(start).normalize();
+                            
+                            // より適切な垂直ベクトルを計算
+                            let perpendicular;
+                            if (Math.abs(direction.y) < 0.9) {
+                                perpendicular = new THREE.Vector3(0, 1, 0);
+                            } else {
+                                perpendicular = new THREE.Vector3(1, 0, 0);
+                            }
+                            
                             const cross = perpendicular.cross(direction).normalize();
                             bondMesh.position.add(cross.multiplyScalar(offset));
                         }
