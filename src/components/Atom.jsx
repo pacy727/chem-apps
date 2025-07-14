@@ -1,4 +1,6 @@
-// 原子コンポーネント
+import React from 'react';
+
+// 原子コンポーネント - 修正版
 const Atom = ({ atom, scale = 1 }) => {
   // atom がない場合のデフォルト値を設定
   if (!atom) {
@@ -13,7 +15,8 @@ const Atom = ({ atom, scale = 1 }) => {
     charge = 0,
     bonds = [],
     ionicState,
-    sharedElectrons = 0
+    sharedElectrons = 0,
+    rotation = 0 // 原子の回転角度（ラジアン）- 元素記号の向きのみに使用
   } = atom;
 
   if (!element) {
@@ -86,13 +89,18 @@ const Atom = ({ atom, scale = 1 }) => {
   const getBondHighlightStyle = (position) => {
     // ハイライト用スタイル
     const highlightSize = radius * 0.2;
+    
+    // 電子ハイライトの位置を計算（回転なし）
+    const highlightX = position.x;
+    const highlightY = position.y;
+    
     return {
       position: 'absolute',
       width: highlightSize,
       height: highlightSize,
       borderRadius: '50%',
       backgroundColor: 'rgba(255, 255, 0, 0.7)', // 黄色のハイライト
-      transform: `translate(${position.x + highlightSize * 0.5}px, ${position.y + highlightSize * 0.5}px)`,
+      transform: `translate(${highlightX}px, ${highlightY}px)`,
       boxShadow: '0 0 5px rgba(255, 255, 0, 0.7)',
       zIndex: 15
     };
@@ -118,7 +126,7 @@ const Atom = ({ atom, scale = 1 }) => {
   const bondedPositions = getBondedElectronPositions();
   
   // 電子を表示するかどうかの判定（結合している方向の電子は非表示）
-  const shouldShowElectron = (position) => {
+  const shouldShowElectron = (position, idx) => {
     // 結合がない場合は全ての電子を表示
     if (!bonds || bonds.length === 0) return true;
     
@@ -139,7 +147,7 @@ const Atom = ({ atom, scale = 1 }) => {
                                     bond.electronPositionAtom2;
                                     
         // 表示しようとしている電子が結合に使われているなら非表示
-        if (position.angle === electronPositions[usedElectronPosition]?.angle) {
+        if (idx === usedElectronPosition) {
           return false;
         }
       }
@@ -201,17 +209,22 @@ const Atom = ({ atom, scale = 1 }) => {
     return style;
   };
   
-  // 電子のスタイルを計算
-  const getElectronStyle = (position, paired, index) => {
+  // 電子のスタイルを計算（回転なし - 電子殻に固定）
+  const getElectronStyle = (electron, index) => {
+    if (!electron) return null;
+    
+    const position = electronPositions[electron.position];
+    if (!position) return null;
+    
     const electronSize = radius * 0.25;
     
-    // 電子の位置を計算（原子の中心からの相対位置）
+    // 電子の位置は固定（回転なし）
     const electronX = position.x;
     const electronY = position.y;
     
     // ペアになっている場合は少しオフセットする
-    const offsetX = paired ? electronSize * 0.6 : 0;
-    const offsetY = paired ? -electronSize * 0.6 : 0;
+    const offsetX = electron.paired ? electronSize * 0.6 : 0;
+    const offsetY = electron.paired ? -electronSize * 0.6 : 0;
     
     return {
       position: 'absolute',
@@ -221,7 +234,24 @@ const Atom = ({ atom, scale = 1 }) => {
       backgroundColor: 'white',
       transform: `translate(${electronX + offsetX}px, ${electronY + offsetY}px)`,
       transition: 'transform 0.2s linear',
-      zIndex: 20
+      zIndex: 20,
+      // 電子のスタイル
+      boxShadow: electron.paired ? 'none' : '0 0 5px rgba(255, 255, 255, 0.7)'
+    };
+  };
+  
+  // 元素記号コンテナのスタイル（回転しない）
+  const getSymbolContainerStyle = () => {
+    return {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      // 回転を打ち消して常に正しい向きに表示
+      transform: `rotate(${-rotation}rad)`,
+      pointerEvents: 'none' // 電子のクリックイベントを妨げないように
     };
   };
   
@@ -243,7 +273,9 @@ const Atom = ({ atom, scale = 1 }) => {
       fontWeight: 'bold',
       zIndex: 30,
       boxShadow: `0 0 ${radius * 0.2}px ${charge > 0 ? 'rgba(255, 100, 100, 0.8)' : 'rgba(100, 100, 255, 0.8)'}`,
-      border: '1px solid white'
+      border: '1px solid white',
+      // 回転を打ち消して常に正しい向きに表示
+      transform: `rotate(${-rotation}rad)`
     };
   };
   
@@ -260,37 +292,63 @@ const Atom = ({ atom, scale = 1 }) => {
     }
   };
   
+  // 不対電子数の表示 - デバッグ用
+  const getUnpairedCountStyle = () => {
+    return {
+      position: 'absolute',
+      bottom: -radius * 0.4,
+      left: -radius * 0.4,
+      backgroundColor: 'rgba(100, 100, 100, 0.8)',
+      color: 'white',
+      borderRadius: '50%',
+      width: radius * 0.8,
+      height: radius * 0.8,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: `${radius * 0.5}px`,
+      fontWeight: 'bold',
+      zIndex: 25,
+      transform: `rotate(${-rotation}rad)`
+    };
+  };
+  
+  // 不対電子の数を取得
+  const getUnpairedElectronCount = () => {
+    if (!valenceElectrons) return 0;
+    return valenceElectrons.filter(e => !e.paired).length;
+  };
+  
   return (
     <div style={getAtomStyle()}>
-      {/* 元素記号 */}
-      {symbol}
+      {/* 元素記号 (常に正しい向きで表示) */}
+      <div style={getSymbolContainerStyle()}>
+        {symbol}
+      </div>
       
-      {/* 電荷表示（イオンの場合） */}
+      {/* 電荷表示（イオンの場合） - 常に正しい向きで表示 */}
       {charge !== 0 && (
         <div style={getChargeStyle()}>
           {charge > 0 ? `+${charge}` : charge}
         </div>
       )}
       
-      {/* 最外殻電子の表示 */}
-      {redistributedElectrons && redistributedElectrons.map((electron, index) => {
-        if (!electron) return null;
-        
-        const position = electronPositions[electron.position];
-        if (!position) return null;
-        
-        // 結合している方向の電子は表示しない
-        if (!shouldShowElectron(position)) {
-          return null;
-        }
-        
-        return (
+      {/* 不対電子数表示 - デバッグ用 */}
+      <div style={getUnpairedCountStyle()}>
+        {getUnpairedElectronCount()}
+      </div>
+      
+      {/* 最外殻電子の表示（固定位置） */}
+      {redistributedElectrons && redistributedElectrons.map((electron, index) => (
+        electron && shouldShowElectron(electron, index) && (
           <div 
-            key={index}
-            style={getElectronStyle(position, electron.paired, index)}
+            key={`electron-${index}`}
+            style={getElectronStyle(electron, index)}
+            data-electron-index={index}
+            data-atom-id={atom.id}
           />
-        );
-      })}
+        )
+      ))}
       
       {/* 結合に使われている電子位置のハイライト表示 */}
       {bondedPositions.map((position, index) => {

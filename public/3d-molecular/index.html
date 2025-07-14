@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分子3Dビューア</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 1000px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .rotation-controls {
+            border-left: 2px solid #ddd;
+            padding-left: 15px;
+            margin-left: 15px;
+        }
+
+        .molecule-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .molecule-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .molecule-btn.active {
+            background: linear-gradient(45deg, #FF6B6B, #FF5252);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .molecule-btn.active:hover {
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .rotation-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #9C27B0, #E91E63);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(156, 39, 176, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rotation-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+        }
+
+        .rotation-btn.paused {
+            background: linear-gradient(45deg, #FF9800, #FF5722);
+            box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+        }
+
+        .rotation-btn.paused:hover {
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+        }
+
+        .viewer-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: #000;
+        }
+
+        .info-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .info-panel h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .info-panel p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+
+        .instructions {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 分子3Dビューア</h1>
+        
+        <div class="controls">
+            <div class="control-section">
+                <button class="molecule-btn active" onclick="showMolecule('H2O', this)">H₂O</button>
+                <button class="molecule-btn" onclick="showMolecule('CO2', this)">CO₂</button>
+                <button class="molecule-btn" onclick="showMolecule('NH3', this)">NH₃</button>
+                <button class="molecule-btn" onclick="showMolecule('CH4', this)">CH₄</button>
+                <button class="molecule-btn" onclick="showMolecule('HCN', this)">HCN</button>
+                <button class="molecule-btn" onclick="showMolecule('H2S', this)">H₂S</button>
+                <button class="molecule-btn" onclick="showMolecule('BH3', this)">BH₃</button>
+                <button class="molecule-btn" onclick="showMolecule('SiH4', this)">SiH₄</button>
+                <button class="molecule-btn" onclick="showMolecule('HF', this)">HF</button>
+                <button class="molecule-btn" onclick="showMolecule('HCl', this)">HCl</button>
+                <button class="molecule-btn" onclick="showMolecule('H2', this)">H₂</button>
+                <button class="molecule-btn" onclick="showMolecule('O2', this)">O₂</button>
+                <button class="molecule-btn" onclick="showMolecule('N2', this)">N₂</button>
+                <button class="molecule-btn" onclick="showMolecule('NH4', this)">NH₄⁺</button>
+                <button class="molecule-btn" onclick="showMolecule('H3O', this)">H₃O⁺</button>
+                <button class="molecule-btn" onclick="showMolecule('C2H6', this)">C₂H₆</button>
+                <button class="molecule-btn" onclick="showMolecule('C2H4', this)">C₂H₄</button>
+                <button class="molecule-btn" onclick="showMolecule('C2H2', this)">C₂H₂</button>
+                <button class="molecule-btn" onclick="showMolecule('CH2O', this)">CH₂O</button>
+            </div>
+            <div class="control-section rotation-controls">
+                <button class="rotation-btn" id="rotationBtn" onclick="toggleRotation()">⏸️ 回転停止</button>
+            </div>
+        </div>
+
+        <div class="viewer-container" id="viewer"></div>
+
+        <div class="info-panel" id="info-panel">
+            <h3 id="molecule-name">H₂O (水)</h3>
+            <p id="molecule-description">水分子は酸素原子1個と水素原子2個から構成されています。分子の形状は曲がった（屈曲）形をしており、結合角は約104.5°です。【極性分子】酸素の電気陰性度が高いため、O-H結合が極性を持ち、分子全体として双極子モーメントを持ちます。</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ff4444;"></div>
+                <span>酸素 (O)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffffff;"></div>
+                <span>水素 (H)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #444444;"></div>
+                <span>炭素 (C)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #4444ff;"></div>
+                <span>窒素 (N)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffcc00;"></div>
+                <span>硫黄 (S)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ff88cc;"></div>
+                <span>ホウ素 (B)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #888888;"></div>
+                <span>ケイ素 (Si)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #90ee90;"></div>
+                <span>フッ素 (F)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #00ff88;"></div>
+                <span>塩素 (Cl)</span>
+            </div>
+        </div>
+
+        <div class="instructions">
+            💡 マウスでドラッグして回転、スクロールでズームできます
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, controls;
+        let currentMolecule = null;
+        let isRotating = true;
+
+        // 分子データ
+        const molecules = {
+            H2O: {
+                name: "H₂O (水)",
+                description: "水分子は酸素原子1個と水素原子2個から構成されています。分子の形状は曲がった（屈曲）形をしており、結合角は約104.5°です。【極性分子】酸素の電気陰性度が高いため、O-H結合が極性を持ち、分子全体として双極子モーメントを持ちます。",
+                atoms: [
+                    { element: 'O', position: [0, 0, 0], color: 0xff4444, radius: 0.5 },
+                    { element: 'H', position: [0.96, 0.25, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.24, 0.97, 0], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 }
+                ]
+            },
+            CO2: {
+                name: "CO₂ (二酸化炭素)",
+                description: "二酸化炭素分子は炭素原子1個と酸素原子2個から構成されています。直線型の分子で、炭素原子が中心に位置し、両側に酸素原子が配置されています。C=O二重結合を持ちます。【無極性分子】C=O結合は極性ですが、直線型構造により双極子モーメントが打ち消し合います。",
+                atoms: [
+                    { element: 'C', position: [0, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'O', position: [1.2, 0, 0], color: 0xff4444, radius: 0.5 },
+                    { element: 'O', position: [-1.2, 0, 0], color: 0xff4444, radius: 0.5 }
+                ],
+                bonds: [
+                    { from: 0, to: 1, type: 'double' },
+                    { from: 0, to: 2, type: 'double' }
+                ]
+            },
+            NH3: {
+                name: "NH₃ (アンモニア)",
+                description: "アンモニア分子は窒素原子1個と水素原子3個から構成されています。三角錐の形状をしており、窒素原子が頂点に位置し、3つの水素原子が底面を形成しています。【極性分子】窒素の電気陰性度が高く、非結合電子対により分子が非対称となるため極性を持ちます。",
+                atoms: [
+                    { element: 'N', position: [0, 0, 0], color: 0x4444ff, radius: 0.5 },
+                    { element: 'H', position: [0.94, -0.54, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.47, -0.54, 0.82], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.47, -0.54, -0.82], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 }
+                ]
+            },
+            CH4: {
+                name: "CH₄ (メタン)",
+                description: "メタン分子は炭素原子1個と水素原子4個から構成されています。正四面体の形状をしており、炭素原子が中心に位置し、4つの水素原子が等しい角度で配置されています。【無極性分子】C-H結合の極性は小さく、正四面体構造により対称性が高いため無極性です。",
+                atoms: [
+                    { element: 'C', position: [0, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'H', position: [0.63, 0.63, 0.63], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.63, -0.63, 0.63], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.63, 0.63, -0.63], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [0.63, -0.63, -0.63], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 },
+                    { from: 0, to: 4 }
+                ]
+            },
+            HCN: {
+                name: "HCN (シアン化水素)",
+                description: "シアン化水素は直線型分子で、炭素と窒素の間に三重結合があります。極めて毒性が強い分子です。【極性分子】C≡N結合とC-H結合の極性により、分子全体として双極子モーメントを持ちます。",
+                atoms: [
+                    { element: 'H', position: [-1.7, 0, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'C', position: [-0.5, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'N', position: [0.7, 0, 0], color: 0x4444ff, radius: 0.5 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 1, to: 2, type: 'triple' }
+                ]
+            },
+            H2S: {
+                name: "H₂S (硫化水素)",
+                description: "硫化水素は水分子と似た屈曲構造を持ちますが、結合角がより小さくなっています。腐った卵のにおいがします。【極性分子】硫黄の電気陰性度により S-H結合が極性を持ち、屈曲構造のため分子全体として極性です。",
+                atoms: [
+                    { element: 'S', position: [0, 0, 0], color: 0xffcc00, radius: 0.6 },
+                    { element: 'H', position: [1.0, 0.2, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.2, 1.0, 0], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 }
+                ]
+            },
+            BH3: {
+                name: "BH₃ (ボラン)",
+                description: "ボランは平面三角形構造を持つ分子です。ホウ素原子は電子不足で、他の分子と結合しやすい性質があります。【無極性分子】B-H結合の極性は小さく、平面三角形の対称構造により無極性です。",
+                atoms: [
+                    { element: 'B', position: [0, 0, 0], color: 0xff88cc, radius: 0.5 },
+                    { element: 'H', position: [1.0, 0, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.5, 0.87, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.5, -0.87, 0], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 }
+                ]
+            },
+            SiH4: {
+                name: "SiH₄ (シラン)",
+                description: "シランはメタンと同じ正四面体構造を持ちます。ケイ素がメタンの炭素の位置にあります。【無極性分子】Si-H結合の極性は小さく、正四面体の対称構造により無極性です。",
+                atoms: [
+                    { element: 'Si', position: [0, 0, 0], color: 0x888888, radius: 0.6 },
+                    { element: 'H', position: [0.7, 0.7, 0.7], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.7, -0.7, 0.7], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.7, 0.7, -0.7], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [0.7, -0.7, -0.7], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 },
+                    { from: 0, to: 4 }
+                ]
+            },
+            HF: {
+                name: "HF (フッ化水素)",
+                description: "フッ化水素は最も単純な二原子分子の一つです。フッ素は電気陰性度が最も高い元素です。【極性分子】H-F結合は非常に大きな極性を持ち、強い双極子モーメントを示します。",
+                atoms: [
+                    { element: 'H', position: [-0.6, 0, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'F', position: [0.6, 0, 0], color: 0x90ee90, radius: 0.5 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 }
+                ]
+            },
+            HCl: {
+                name: "HCl (塩化水素)",
+                description: "塩化水素は塩酸の原料となる分子です。水に溶けると強酸性を示します。【極性分子】塩素の電気陰性度により H-Cl結合が大きな極性を持ちます。",
+                atoms: [
+                    { element: 'H', position: [-0.8, 0, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'Cl', position: [0.8, 0, 0], color: 0x00ff88, radius: 0.6 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 }
+                ]
+            },
+            H2: {
+                name: "H₂ (水素分子)",
+                description: "水素分子は最も単純な分子で、2つの水素原子が共有結合で結ばれています。【無極性分子】同じ原子同士の結合のため、完全に無極性です。",
+                atoms: [
+                    { element: 'H', position: [-0.4, 0, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [0.4, 0, 0], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 }
+                ]
+            },
+            O2: {
+                name: "O₂ (酸素分子)",
+                description: "酸素分子は2つの酸素原子が二重結合で結ばれています。生命に不可欠な分子です。【無極性分子】同じ原子同士の結合のため、完全に無極性です。",
+                atoms: [
+                    { element: 'O', position: [-0.6, 0, 0], color: 0xff4444, radius: 0.5 },
+                    { element: 'O', position: [0.6, 0, 0], color: 0xff4444, radius: 0.5 }
+                ],
+                bonds: [
+                    { from: 0, to: 1, type: 'double' }
+                ]
+            },
+            N2: {
+                name: "N₂ (窒素分子)",
+                description: "窒素分子は2つの窒素原子が三重結合で結ばれており、非常に安定な分子です。大気の約78%を占めます。【無極性分子】同じ原子同士の結合のため、完全に無極性です。",
+                atoms: [
+                    { element: 'N', position: [-0.55, 0, 0], color: 0x4444ff, radius: 0.5 },
+                    { element: 'N', position: [0.55, 0, 0], color: 0x4444ff, radius: 0.5 }
+                ],
+                bonds: [
+                    { from: 0, to: 1, type: 'triple' }
+                ]
+            },
+            NH4: {
+                name: "NH₄⁺ (アンモニウムイオン)",
+                description: "アンモニウムイオンは正四面体構造を持つ陽イオンです。アンモニアが水素イオンを受け取って形成されます。【無極性イオン】正四面体の対称構造により、イオン内での電荷分布は均等です。",
+                atoms: [
+                    { element: 'N', position: [0, 0, 0], color: 0x4444ff, radius: 0.5 },
+                    { element: 'H', position: [0.7, 0.7, 0.7], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.7, -0.7, 0.7], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.7, 0.7, -0.7], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [0.7, -0.7, -0.7], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 },
+                    { from: 0, to: 4 }
+                ]
+            },
+            H3O: {
+                name: "H₃O⁺ (オキソニウムイオン)",
+                description: "オキソニウムイオンは三角錐構造を持つ陽イオンです。水分子が水素イオンを受け取って形成されます。【極性イオン】三角錐構造により、イオン内での電荷分布に偏りがあります。",
+                atoms: [
+                    { element: 'O', position: [0, 0, 0], color: 0xff4444, radius: 0.5 },
+                    { element: 'H', position: [0.94, -0.54, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.47, -0.54, 0.82], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-0.47, -0.54, -0.82], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 }
+                ]
+            },
+            C2H6: {
+                name: "C₂H₆ (エタン)",
+                description: "エタンは2つの炭素原子が単結合で結ばれたアルカンです。各炭素は正四面体構造を持ちます。【無極性分子】C-C結合とC-H結合の極性は小さく、分子全体として対称性が高いため無極性です。",
+                atoms: [
+                    { element: 'C', position: [-0.8, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'C', position: [0.8, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'H', position: [-1.3, 0.9, 0.5], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-1.3, -0.9, 0.5], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-1.3, 0, -1.0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [1.3, 0.9, 0.5], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [1.3, -0.9, 0.5], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [1.3, 0, -1.0], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 },
+                    { from: 0, to: 4 },
+                    { from: 1, to: 5 },
+                    { from: 1, to: 6 },
+                    { from: 1, to: 7 }
+                ]
+            },
+            C2H4: {
+                name: "C₂H₄ (エチレン)",
+                description: "エチレンは2つの炭素原子が二重結合で結ばれたアルケンです。平面分子で、重要な化学原料です。【無極性分子】C=C結合とC-H結合の極性は小さく、平面構造の対称性により無極性です。",
+                atoms: [
+                    { element: 'C', position: [-0.7, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'C', position: [0.7, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'H', position: [-1.2, 0.9, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [-1.2, -0.9, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [1.2, 0.9, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [1.2, -0.9, 0], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1, type: 'double' },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 },
+                    { from: 1, to: 4 },
+                    { from: 1, to: 5 }
+                ]
+            },
+            C2H2: {
+                name: "C₂H₂ (アセチレン)",
+                description: "アセチレンは2つの炭素原子が三重結合で結ばれた直線型分子です。溶接などに使用されます。【無極性分子】C≡C結合とC-H結合の極性は小さく、直線構造の対称性により無極性です。",
+                atoms: [
+                    { element: 'H', position: [-1.7, 0, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'C', position: [-0.6, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'C', position: [0.6, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'H', position: [1.7, 0, 0], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1 },
+                    { from: 1, to: 2, type: 'triple' },
+                    { from: 2, to: 3 }
+                ]
+            },
+            CH2O: {
+                name: "CH₂O (ホルムアルデヒド)",
+                description: "ホルムアルデヒドは平面三角形構造を持つアルデヒドです。C=O二重結合を持ちます。【極性分子】C=O結合の強い極性により、分子全体として大きな双極子モーメントを持ちます。",
+                atoms: [
+                    { element: 'C', position: [0, 0, 0], color: 0x444444, radius: 0.5 },
+                    { element: 'O', position: [0, 1.2, 0], color: 0xff4444, radius: 0.5 },
+                    { element: 'H', position: [-0.9, -0.6, 0], color: 0xffffff, radius: 0.3 },
+                    { element: 'H', position: [0.9, -0.6, 0], color: 0xffffff, radius: 0.3 }
+                ],
+                bonds: [
+                    { from: 0, to: 1, type: 'double' },
+                    { from: 0, to: 2 },
+                    { from: 0, to: 3 }
+                ]
+            }
+        };
+
+        // OrbitControlsを手動実装
+        class OrbitControls {
+            constructor(camera, domElement) {
+                this.camera = camera;
+                this.domElement = domElement;
+                this.enabled = true;
+                this.enableDamping = true;
+                this.dampingFactor = 0.25;
+                this.enableZoom = true;
+                this.enableRotate = true;
+                this.enablePan = false;
+
+                this.minDistance = 3;
+                this.maxDistance = 15;
+
+                this.spherical = { radius: 8, phi: Math.PI / 3, theta: 0 };
+                this.sphericalDelta = { radius: 0, phi: 0, theta: 0 };
+
+                this.rotateStart = { x: 0, y: 0 };
+                this.rotateEnd = { x: 0, y: 0 };
+                this.rotateDelta = { x: 0, y: 0 };
+
+                this.isRotating = false;
+
+                this.setupEventListeners();
+                this.update();
+            }
+
+            setupEventListeners() {
+                this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+                this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this));
+                this.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+
+            onMouseDown(event) {
+                if (!this.enabled || !this.enableRotate) return;
+                
+                event.preventDefault();
+                this.isRotating = true;
+
+                this.rotateStart.x = event.clientX;
+                this.rotateStart.y = event.clientY;
+
+                document.addEventListener('mousemove', this.onMouseMove.bind(this));
+                document.addEventListener('mouseup', this.onMouseUp.bind(this));
+            }
+
+            onMouseMove(event) {
+                if (!this.isRotating) return;
+
+                this.rotateEnd.x = event.clientX;
+                this.rotateEnd.y = event.clientY;
+
+                this.rotateDelta.x = this.rotateEnd.x - this.rotateStart.x;
+                this.rotateDelta.y = this.rotateEnd.y - this.rotateStart.y;
+
+                this.sphericalDelta.theta -= 2 * Math.PI * this.rotateDelta.x / this.domElement.clientWidth;
+                this.sphericalDelta.phi -= 2 * Math.PI * this.rotateDelta.y / this.domElement.clientHeight;
+
+                this.rotateStart.x = this.rotateEnd.x;
+                this.rotateStart.y = this.rotateEnd.y;
+
+                this.update();
+            }
+
+            onMouseUp() {
+                this.isRotating = false;
+                document.removeEventListener('mousemove', this.onMouseMove);
+                document.removeEventListener('mouseup', this.onMouseUp);
+            }
+
+            onMouseWheel(event) {
+                if (!this.enabled || !this.enableZoom) return;
+                
+                event.preventDefault();
+                
+                if (event.deltaY < 0) {
+                    this.sphericalDelta.radius *= 0.9;
+                } else {
+                    this.sphericalDelta.radius *= 1.1;
+                }
+
+                this.update();
+            }
+
+            update() {
+                this.spherical.radius += this.sphericalDelta.radius;
+                this.spherical.theta += this.sphericalDelta.theta;
+                this.spherical.phi += this.sphericalDelta.phi;
+
+                this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius));
+                this.spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, this.spherical.phi));
+
+                const x = this.spherical.radius * Math.sin(this.spherical.phi) * Math.cos(this.spherical.theta);
+                const y = this.spherical.radius * Math.cos(this.spherical.phi);
+                const z = this.spherical.radius * Math.sin(this.spherical.phi) * Math.sin(this.spherical.theta);
+
+                this.camera.position.set(x, y, z);
+                this.camera.lookAt(0, 0, 0);
+
+                if (this.enableDamping) {
+                    this.sphericalDelta.radius *= (1 - this.dampingFactor);
+                    this.sphericalDelta.theta *= (1 - this.dampingFactor);
+                    this.sphericalDelta.phi *= (1 - this.dampingFactor);
+                } else {
+                    this.sphericalDelta.radius = 0;
+                    this.sphericalDelta.theta = 0;
+                    this.sphericalDelta.phi = 0;
+                }
+            }
+        }
+
+        // 初期化
+        function init() {
+            const viewer = document.getElementById('viewer');
+            
+            // シーン作成
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+
+            // カメラ作成
+            camera = new THREE.PerspectiveCamera(75, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
+            camera.position.set(5, 3, 5);
+
+            // レンダラー作成
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            viewer.appendChild(renderer.domElement);
+
+            // ライト設定
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // コントロール設定
+            controls = new OrbitControls(camera, renderer.domElement);
+
+            // リサイズ対応
+            window.addEventListener('resize', onWindowResize, false);
+
+            // 初期分子表示
+            showMolecule('H2O', document.querySelector('.molecule-btn.active'));
+
+            // アニメーションループ開始
+            animate();
+        }
+
+        function onWindowResize() {
+            const viewer = document.getElementById('viewer');
+            camera.aspect = viewer.clientWidth / viewer.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (currentMolecule && isRotating) {
+                currentMolecule.rotation.y += 0.01;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function clearScene() {
+            while (scene.children.length > 0) {
+                const child = scene.children[0];
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(material => material.dispose());
+                    } else {
+                        child.material.dispose();
+                    }
+                }
+                scene.remove(child);
+            }
+
+            // ライトを再追加
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+        }
+
+        function showMolecule(moleculeKey, buttonElement) {
+            // エラーハンドリング追加
+            if (!molecules[moleculeKey]) {
+                console.error(`Molecule ${moleculeKey} not found`);
+                return;
+            }
+
+            const molecule = molecules[moleculeKey];
+            
+            // エラーハンドリング追加
+            if (!molecule.atoms || !Array.isArray(molecule.atoms)) {
+                console.error(`Invalid molecule data for ${moleculeKey}`);
+                return;
+            }
+
+            // ボタンの状態更新
+            document.querySelectorAll('.molecule-btn').forEach(btn => btn.classList.remove('active'));
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+
+            // 情報パネル更新
+            document.getElementById('molecule-name').textContent = molecule.name;
+            document.getElementById('molecule-description').textContent = molecule.description;
+
+            // シーンクリア
+            clearScene();
+
+            // 分子グループ作成
+            const moleculeGroup = new THREE.Group();
+
+            // 原子を追加
+            molecule.atoms.forEach((atom, index) => {
+                // エラーハンドリング追加
+                if (!atom.position || !Array.isArray(atom.position) || atom.position.length < 3) {
+                    console.error(`Invalid atom position for atom ${index} in molecule ${moleculeKey}`);
+                    return;
+                }
+
+                const geometry = new THREE.SphereGeometry(atom.radius || 0.5, 32, 32);
+                const material = new THREE.MeshLambertMaterial({ 
+                    color: atom.color || 0xffffff 
+                });
+                const atomMesh = new THREE.Mesh(geometry, material);
+                atomMesh.position.set(atom.position[0], atom.position[1], atom.position[2]);
+                atomMesh.castShadow = true;
+                atomMesh.receiveShadow = true;
+                moleculeGroup.add(atomMesh);
+            });
+
+            // 結合を追加
+            if (molecule.bonds && Array.isArray(molecule.bonds)) {
+                molecule.bonds.forEach(bond => {
+                    // エラーハンドリング追加
+                    if (bond.from >= molecule.atoms.length || bond.to >= molecule.atoms.length) {
+                        console.error(`Invalid bond indices in molecule ${moleculeKey}`);
+                        return;
+                    }
+
+                    const fromAtom = molecule.atoms[bond.from];
+                    const toAtom = molecule.atoms[bond.to];
+                    
+                    if (!fromAtom.position || !toAtom.position) {
+                        console.error(`Invalid atom positions for bond in molecule ${moleculeKey}`);
+                        return;
+                    }
+
+                    const bondType = bond.type || 'single';
+                    const bondCount = bondType === 'single' ? 1 : bondType === 'double' ? 2 : 3;
+
+                    for (let i = 0; i < bondCount; i++) {
+                        const geometry = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
+                        const material = new THREE.MeshLambertMaterial({ color: 0xcccccc });
+                        const bondMesh = new THREE.Mesh(geometry, material);
+
+                        const start = new THREE.Vector3(fromAtom.position[0], fromAtom.position[1], fromAtom.position[2]);
+                        const end = new THREE.Vector3(toAtom.position[0], toAtom.position[1], toAtom.position[2]);
+                        const distance = start.distanceTo(end);
+
+                        bondMesh.scale.y = distance;
+                        bondMesh.position.copy(start.clone().add(end).multiplyScalar(0.5));
+
+                        if (bondCount > 1) {
+                            const offset = (i - (bondCount - 1) / 2) * 0.15;
+                            const perpendicular = new THREE.Vector3(0, 1, 0);
+                            const direction = end.clone().sub(start).normalize();
+                            const cross = perpendicular.cross(direction).normalize();
+                            bondMesh.position.add(cross.multiplyScalar(offset));
+                        }
+
+                        const direction = end.clone().sub(start);
+                        bondMesh.lookAt(bondMesh.position.clone().add(direction));
+                        bondMesh.rotateX(Math.PI / 2);
+
+                        moleculeGroup.add(bondMesh);
+                    }
+                });
+            }
+
+            scene.add(moleculeGroup);
+            currentMolecule = moleculeGroup;
+        }
+
+        function toggleRotation() {
+            isRotating = !isRotating;
+            const btn = document.getElementById('rotationBtn');
+            if (isRotating) {
+                btn.textContent = '⏸️ 回転停止';
+                btn.classList.remove('paused');
+            } else {
+                btn.textContent = '▶️ 回転開始';
+                btn.classList.add('paused');
+            }
+        }
+
+        // ページ読み込み時に初期化
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

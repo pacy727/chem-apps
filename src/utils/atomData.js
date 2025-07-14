@@ -1,10 +1,12 @@
+// atomData.js - 元素データと性質を定義
+
 // 原子データモジュールの状態管理
 let atomsCache = []; // 原子のキャッシュ（結合判定で使用）
 
 // キャッシュを更新する関数
 export const updateAtomsCache = (atoms) => {
   atomsCache = [...atoms];
-};// atomData.js - 元素データと性質を定義
+};
 
 // 元素データ - 元素記号、名前、最外殻電子数、電気陰性度、金属/非金属区分、色、原子価電子配置
 export const elements = {
@@ -30,7 +32,7 @@ export const elements = {
     type: 'nonmetal', 
     color: '#909090', 
     valenceElectrons: [
-      { position: 0, paired: false }, // 2p²の4つの不対電子（sp³混成軌道）
+      { position: 0, paired: false }, // sp³混成軌道の4つの不対電子
       { position: 2, paired: false },
       { position: 4, paired: false },
       { position: 6, paired: false }
@@ -48,10 +50,10 @@ export const elements = {
     type: 'nonmetal', 
     color: '#3050F8', 
     valenceElectrons: [
-      { position: 0, paired: false }, // 2p³の3つの不対電子
+      { position: 0, paired: false }, // 3つの不対電子
       { position: 2, paired: false },
       { position: 4, paired: false },
-      { position: 6, paired: true },  // 1対の対電子
+      { position: 6, paired: true },  // 1対の電子対
       { position: 6, paired: true }
     ],
     atomicRadius: 14,
@@ -67,9 +69,9 @@ export const elements = {
     type: 'nonmetal', 
     color: '#FF0D0D', 
     valenceElectrons: [
-      { position: 0, paired: false }, // 2p⁴の2つの不対電子
+      { position: 0, paired: false }, // 2つの不対電子
       { position: 2, paired: false },
-      { position: 4, paired: true },  // 2対の対電子
+      { position: 4, paired: true },  // 2対の電子対
       { position: 4, paired: true },
       { position: 6, paired: true },
       { position: 6, paired: true }
@@ -87,8 +89,8 @@ export const elements = {
     type: 'nonmetal', 
     color: '#90E050', 
     valenceElectrons: [
-      { position: 0, paired: false }, // 2p⁵の1つの不対電子
-      { position: 2, paired: true },  // 3対の対電子
+      { position: 0, paired: false }, // 1つの不対電子
+      { position: 2, paired: true },  // 3対の電子対
       { position: 2, paired: true },
       { position: 4, paired: true },
       { position: 4, paired: true },
@@ -108,8 +110,8 @@ export const elements = {
     type: 'nonmetal', 
     color: '#1FF01F', 
     valenceElectrons: [
-      { position: 0, paired: false }, // 3p⁵の1つの不対電子
-      { position: 2, paired: true },  // 3対の対電子
+      { position: 0, paired: false }, // 1つの不対電子
+      { position: 2, paired: true },  // 3対の電子対
       { position: 2, paired: true },
       { position: 4, paired: true },
       { position: 4, paired: true },
@@ -130,7 +132,7 @@ export const elements = {
     electronegativity: 1.0, 
     type: 'metal', 
     color: '#CC80FF', 
-    valenceElectrons: [{ position: 0, paired: false }], // 2s¹
+    valenceElectrons: [{ position: 0, paired: false }], // 2s¹ - 1つの不対電子
     atomicRadius: 18,
     mass: 7,
     maxCharge: 1,
@@ -143,7 +145,7 @@ export const elements = {
     electronegativity: 0.9, 
     type: 'metal', 
     color: '#AB5CF2', 
-    valenceElectrons: [{ position: 0, paired: false }], // 3s¹
+    valenceElectrons: [{ position: 0, paired: false }], // 3s¹ - 1つの不対電子
     atomicRadius: 22,
     mass: 23,
     maxCharge: 1,
@@ -156,7 +158,7 @@ export const elements = {
     electronegativity: 0.8, 
     type: 'metal', 
     color: '#8F40D4', 
-    valenceElectrons: [{ position: 0, paired: false }], // 4s¹
+    valenceElectrons: [{ position: 0, paired: false }], // 4s¹ - 1つの不対電子
     atomicRadius: 26,
     mass: 39,
     maxCharge: 1,
@@ -170,7 +172,7 @@ export const elements = {
     type: 'metal', 
     color: '#8AFF00', 
     valenceElectrons: [
-      { position: 0, paired: false }, // 3s²
+      { position: 0, paired: false }, // 3s² - 2つの不対電子
       { position: 4, paired: false }
     ],
     atomicRadius: 20,
@@ -186,7 +188,7 @@ export const elements = {
     type: 'metal', 
     color: '#3DFF00', 
     valenceElectrons: [
-      { position: 0, paired: false }, // 4s²
+      { position: 0, paired: false }, // 4s² - 2つの不対電子
       { position: 4, paired: false }
     ],
     atomicRadius: 24,
@@ -202,7 +204,7 @@ export const elements = {
     type: 'metal', 
     color: '#BFA6A6', 
     valenceElectrons: [
-      { position: 0, paired: false }, // 3s²3p¹
+      { position: 0, paired: false }, // 3s²3p¹ - 3つの不対電子
       { position: 2, paired: false },
       { position: 4, paired: false }
     ],
@@ -211,74 +213,6 @@ export const elements = {
     maxCharge: 3,
     desiredElectrons: 0
   }
-};
-
-// 分子の固体・液体・気体の状態を決定
-export const determineState = (molecule) => {
-  // 分子の構成と結合の種類から状態を決定
-  // イオン結合はほとんどの場合固体
-  if (molecule.bondType === 'ionic') {
-    return 'solid';
-  }
-  
-  // 共有結合の場合は分子の種類による
-  const symbols = molecule.atoms.map(atom => atom.element.symbol).sort().join('');
-  
-  // 一般的な気体分子
-  const gases = ['H2', 'N2', 'O2', 'F2', 'Cl2', 'CO2', 'CH4', 'NH3'];
-  if (gases.some(gas => symbols.includes(gas))) {
-    return 'gas';
-  }
-  
-  // その他の単純な分子は液体か固体として扱う
-  if (molecule.atoms.length <= 4) {
-    return 'liquid';
-  }
-  
-  return 'solid';
-};
-
-// 原子間の結合の種類を判定
-export const determineBondType = (atom1, atom2) => {
-  // 両方とも非金属の場合は共有結合
-  if (atom1.element.type === 'nonmetal' && atom2.element.type === 'nonmetal') {
-    return 'covalent';
-  }
-  
-  // 一方が金属で一方が非金属の場合はイオン結合
-  if (
-    (atom1.element.type === 'metal' && atom2.element.type === 'nonmetal') ||
-    (atom1.element.type === 'nonmetal' && atom2.element.type === 'metal')
-  ) {
-    return 'ionic';
-  }
-  
-  // 両方金属の場合は金属結合（ここでは単純化してイオン結合として扱う）
-  return 'metallic';
-};
-
-// 共有結合の極性を計算
-export const calculateBondPolarity = (atom1, atom2) => {
-  const electronegDiff = Math.abs(atom1.element.electronegativity - atom2.element.electronegativity);
-  
-  // 差が0.5未満ならほぼ無極性
-  if (electronegDiff < 0.5) {
-    return { polarity: 'nonpolar', shift: 0 };
-  }
-  
-  // 差が0.5〜1.7は極性共有結合
-  if (electronegDiff < 1.7) {
-    const shift = electronegDiff * 5; // 電子対のシフト量を電気陰性度の差に比例させる
-    // 電気陰性度が高い方に電子をシフト
-    if (atom1.element.electronegativity > atom2.element.electronegativity) {
-      return { polarity: 'polar', shift: shift, direction: 'to1' };
-    } else {
-      return { polarity: 'polar', shift: shift, direction: 'to2' };
-    }
-  }
-  
-  // 差が1.7以上ならイオン結合的
-  return { polarity: 'ionic', shift: 10 };
 };
 
 // 原子が結合可能かどうかを判定
@@ -383,24 +317,45 @@ export const canBond = (atom1, atom2) => {
   return false;
 };
 
-// 分子量を計算
-export const calculateMolecularMass = (atoms) => {
-  return atoms.reduce((sum, atom) => sum + atom.element.mass, 0);
+// 原子間の結合の種類を判定
+export const determineBondType = (atom1, atom2) => {
+  // 両方とも非金属の場合は共有結合
+  if (atom1.element.type === 'nonmetal' && atom2.element.type === 'nonmetal') {
+    return 'covalent';
+  }
+  
+  // 一方が金属で一方が非金属の場合はイオン結合
+  if (
+    (atom1.element.type === 'metal' && atom2.element.type === 'nonmetal') ||
+    (atom1.element.type === 'nonmetal' && atom2.element.type === 'metal')
+  ) {
+    return 'ionic';
+  }
+  
+  // 両方金属の場合は金属結合（ここでは単純化してイオン結合として扱う）
+  return 'metallic';
 };
 
-// 結合した分子が安定かどうかを判定
-export const isMoleculeStable = (atoms) => {
-  // シンプルな実装：すべての原子が八隅子規則（または水素の場合は2電子）を満たすかチェック
-  return atoms.every(atom => {
-    const valenceElectronCount = atom.element.outerElectrons;
-    const bondCount = atom.bonds.length;
-    
-    // 水素は2電子（1結合）で安定
-    if (atom.element.symbol === 'H') {
-      return bondCount === 1;
+// 共有結合の極性を計算
+export const calculateBondPolarity = (atom1, atom2) => {
+  const electronegDiff = Math.abs(atom1.element.electronegativity - atom2.element.electronegativity);
+  
+  // 差が0.5未満ならほぼ無極性
+  if (electronegDiff < 0.5) {
+    return { polarity: 'nonpolar', shift: 0 };
+  }
+  
+  // 差が0.5〜1.7は極性共有結合
+  if (electronegDiff < 1.7) {
+    const shift = electronegDiff * 5; // 電子対のシフト量を電気陰性度の差に比例させる
+    // 電気陰性度が高い方に電子をシフト
+    if (atom1.element.electronegativity > atom2.element.electronegativity) {
+      return { polarity: 'polar', shift: shift, direction: 'to1' };
+    } else {
+      return { polarity: 'polar', shift: shift, direction: 'to2' };
     }
-    
-    // それ以外は8電子（共有結合なら4結合まで）で安定
-    return (valenceElectronCount + bondCount) >= 8;
-  });
+  }
+  
+  // 差が1.7以上ならイオン結合的
+  return { polarity: 'ionic', shift: 10 };
 };
