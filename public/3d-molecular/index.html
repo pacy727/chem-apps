@@ -16,57 +16,53 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
+            overflow: hidden;
         }
 
-        .container {
+        .sidebar {
+            width: 280px;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            max-width: 1000px;
-            width: 100%;
             backdrop-filter: blur(10px);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 100vh;
         }
 
-        h1 {
+        .sidebar h1 {
             text-align: center;
             color: #333;
             margin-bottom: 30px;
-            font-size: 2.5em;
+            font-size: 1.8em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+        .molecule-section {
             margin-bottom: 30px;
-            flex-wrap: wrap;
         }
 
-        .control-section {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
+        .molecule-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
         }
 
-        .rotation-controls {
-            border-left: 2px solid #ddd;
-            padding-left: 15px;
-            margin-left: 15px;
+        .molecule-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
         .molecule-btn {
-            padding: 8px 16px;
+            padding: 10px 8px;
             border: none;
-            border-radius: 20px;
+            border-radius: 15px;
             background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -76,8 +72,8 @@
         }
 
         .molecule-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
         }
 
         .molecule-btn.active {
@@ -86,11 +82,16 @@
         }
 
         .molecule-btn.active:hover {
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         .rotation-btn {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: none;
             border-radius: 20px;
             background: linear-gradient(45deg, #9C27B0, #E91E63);
@@ -102,6 +103,7 @@
             box-shadow: 0 3px 10px rgba(156, 39, 176, 0.3);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            width: 100%;
         }
 
         .rotation-btn:hover {
@@ -118,22 +120,67 @@
             box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
         }
 
+        .legend {
+            margin-top: 20px;
+        }
+
+        .legend h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 8px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+        }
+
         .viewer-container {
+            flex: 1;
             position: relative;
-            width: 100%;
-            height: 500px;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             background: #000;
+            min-height: 400px;
         }
 
         .info-panel {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             border-left: 5px solid #4CAF50;
+            max-height: 200px;
         }
 
         .info-panel h3 {
@@ -148,53 +195,58 @@
             margin-bottom: 10px;
         }
 
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 5px 10px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid #333;
-        }
-
         .instructions {
             text-align: center;
             color: #666;
             font-size: 14px;
-            margin-top: 10px;
             font-style: italic;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: none;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+                min-height: 70vh;
+            }
+
+            .molecule-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🧪 分子3Dビューア</h1>
+    <div class="sidebar">
+        <h1>🧪 分子選択</h1>
         
-        <div class="controls">
-            <div class="control-section">
+        <div class="molecule-section">
+            <h3>基本分子</h3>
+            <div class="molecule-grid">
                 <button class="molecule-btn active" onclick="showMolecule('H2O', this)">H₂O</button>
                 <button class="molecule-btn" onclick="showMolecule('CO2', this)">CO₂</button>
                 <button class="molecule-btn" onclick="showMolecule('NH3', this)">NH₃</button>
                 <button class="molecule-btn" onclick="showMolecule('CH4', this)">CH₄</button>
                 <button class="molecule-btn" onclick="showMolecule('HCN', this)">HCN</button>
                 <button class="molecule-btn" onclick="showMolecule('H2S', this)">H₂S</button>
+            </div>
+        </div>
+
+        <div class="molecule-section">
+            <h3>単純分子</h3>
+            <div class="molecule-grid">
                 <button class="molecule-btn" onclick="showMolecule('BH3', this)">BH₃</button>
                 <button class="molecule-btn" onclick="showMolecule('SiH4', this)">SiH₄</button>
                 <button class="molecule-btn" onclick="showMolecule('HF', this)">HF</button>
@@ -202,18 +254,75 @@
                 <button class="molecule-btn" onclick="showMolecule('H2', this)">H₂</button>
                 <button class="molecule-btn" onclick="showMolecule('O2', this)">O₂</button>
                 <button class="molecule-btn" onclick="showMolecule('N2', this)">N₂</button>
+            </div>
+        </div>
+
+        <div class="molecule-section">
+            <h3>イオン</h3>
+            <div class="molecule-grid">
                 <button class="molecule-btn" onclick="showMolecule('NH4', this)">NH₄⁺</button>
                 <button class="molecule-btn" onclick="showMolecule('H3O', this)">H₃O⁺</button>
+            </div>
+        </div>
+
+        <div class="molecule-section">
+            <h3>有機分子</h3>
+            <div class="molecule-grid">
                 <button class="molecule-btn" onclick="showMolecule('C2H6', this)">C₂H₆</button>
                 <button class="molecule-btn" onclick="showMolecule('C2H4', this)">C₂H₄</button>
                 <button class="molecule-btn" onclick="showMolecule('C2H2', this)">C₂H₂</button>
                 <button class="molecule-btn" onclick="showMolecule('CH2O', this)">CH₂O</button>
             </div>
-            <div class="control-section rotation-controls">
-                <button class="rotation-btn" id="rotationBtn" onclick="toggleRotation()">⏸️ 回転停止</button>
-            </div>
         </div>
 
+        <div class="controls">
+            <button class="rotation-btn" id="rotationBtn" onclick="toggleRotation()">⏸️ 回転停止</button>
+        </div>
+
+        <div class="legend">
+            <h4>元素の色</h4>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff4444;"></div>
+                    <span>酸素 (O)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffffff;"></div>
+                    <span>水素 (H)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #444444;"></div>
+                    <span>炭素 (C)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #4444ff;"></div>
+                    <span>窒素 (N)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffcc00;"></div>
+                    <span>硫黄 (S)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff88cc;"></div>
+                    <span>ホウ素 (B)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #888888;"></div>
+                    <span>ケイ素 (Si)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #90ee90;"></div>
+                    <span>フッ素 (F)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00ff88;"></div>
+                    <span>塩素 (Cl)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
         <div class="viewer-container" id="viewer"></div>
 
         <div class="info-panel" id="info-panel">
@@ -221,47 +330,8 @@
             <p id="molecule-description">水分子は酸素原子1個と水素原子2個から構成されています。分子の形状は曲がった（屈曲）形をしており、結合角は約104.5°です。【極性分子】酸素の電気陰性度が高いため、O-H結合が極性を持ち、分子全体として双極子モーメントを持ちます。</p>
         </div>
 
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ff4444;"></div>
-                <span>酸素 (O)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ffffff;"></div>
-                <span>水素 (H)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #444444;"></div>
-                <span>炭素 (C)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #4444ff;"></div>
-                <span>窒素 (N)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ffcc00;"></div>
-                <span>硫黄 (S)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ff88cc;"></div>
-                <span>ホウ素 (B)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #888888;"></div>
-                <span>ケイ素 (Si)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #90ee90;"></div>
-                <span>フッ素 (F)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #00ff88;"></div>
-                <span>塩素 (Cl)</span>
-            </div>
-        </div>
-
         <div class="instructions">
-            💡 マウスでドラッグして回転、スクロールでズームできます
+            💡 マウスでドラッグして回転、マウスホイールでズームできます
         </div>
     </div>
 
@@ -550,7 +620,7 @@
             }
         };
 
-        // OrbitControlsを手動実装
+        // OrbitControlsを手動実装（ズーム機能を有効化）
         class OrbitControls {
             constructor(camera, domElement) {
                 this.camera = camera;
@@ -558,7 +628,7 @@
                 this.enabled = true;
                 this.enableDamping = true;
                 this.dampingFactor = 0.25;
-                this.enableZoom = true;
+                this.enableZoom = true;  // ズーム機能を有効化
                 this.enableRotate = true;
                 this.enablePan = false;
 
@@ -580,7 +650,7 @@
 
             setupEventListeners() {
                 this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
-                this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this));
+                this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this), { passive: false });
                 this.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
             }
 
@@ -626,11 +696,19 @@
                 
                 event.preventDefault();
                 
+                // ズーム速度を調整
+                const zoomSpeed = 0.1;
+                
                 if (event.deltaY < 0) {
-                    this.sphericalDelta.radius *= 0.9;
+                    // ズームイン
+                    this.spherical.radius *= (1 - zoomSpeed);
                 } else {
-                    this.sphericalDelta.radius *= 1.1;
+                    // ズームアウト
+                    this.spherical.radius *= (1 + zoomSpeed);
                 }
+
+                // 距離制限を適用
+                this.spherical.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.spherical.radius));
 
                 this.update();
             }
