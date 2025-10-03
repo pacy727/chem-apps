@@ -118,6 +118,26 @@ export default function Home() {
                 transition-all 
                 duration-300
               "
+              href="/crystal"
+            >
+              結晶格子モデル
+            </Link>
+          </li>
+          <li>
+            <Link
+              className="
+                inline-block 
+                w-72   /* 幅 12rem (48×0.25rem) */
+                h-13   /* 高さ 3.5rem               */                 
+                px-6 py-3 
+                text-lg font-semibold 
+                text-white 
+                bg-blue-500 hover:bg-blue-600 
+                rounded-full 
+                shadow-md 
+                transition-all 
+                duration-300
+              "
               href="https://pacy727.github.io/base_chem_site/molmaster.html"
             >
               モル・マスターへの道
