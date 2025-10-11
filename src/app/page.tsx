@@ -188,6 +188,26 @@ export default function Home() {
               その他
             </h2>
             <ul className="space-y-4">
+            <li>
+                <Link
+                  className="
+                    block
+                    w-full
+                    px-4 py-3 
+                    text-base font-semibold 
+                    text-center
+                    text-white 
+                    bg-orange-500 hover:bg-orange-600 
+                    rounded-full 
+                    shadow-md 
+                    transition-all 
+                    duration-300
+                  "
+                  href="https://pacy727.github.io/base_chem_site/index.html"
+                >
+                  化学基礎攻略サイト
+                </Link>
+              </li>
               <li>
                 <Link
                   className="
