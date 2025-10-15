@@ -154,7 +154,7 @@ export default function Home() {
                     transition-all 
                     duration-300
                   "
-                  href="https://pacy727.github.io/base_chem_site/molmaster.html"
+                  href="https://pacy727.github.io/base_chem_site/molmaster2.html"
                 >
                   モル・マスターへの道
                 </Link>
